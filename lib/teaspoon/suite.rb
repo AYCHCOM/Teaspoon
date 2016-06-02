@@ -49,8 +49,15 @@ module Teaspoon
     end
 
     def asset_tree(sources)
+      major_version = Sprockets::VERSION.split('.')[0].to_i
+      pipeline = if major_version >= 4
+        :debug
+      else
+        nil
+      end
+
       sources.flat_map do |source|
-        asset = @env.find_asset(source, accept: "application/javascript", pipeline: :debug)
+        asset = @env.find_asset(source, accept: "application/javascript", pipeline: pipeline)
 
         if asset && asset.respond_to?(:logical_path)
           asset_and_dependencies(asset).map { |a| asset_url(a) }
